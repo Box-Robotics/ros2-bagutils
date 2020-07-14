@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd"
+            schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>baggie</name>
+  <version>0.1.0</version>
+  <description>An unofficial Python wrapper around the ROS2 C++ Bag API</description>
+  <author email="tom@boxrobotics.ai">Tom Panzarella</author>
+  <maintainer email="tom@boxrobotics.ai">Tom Panzarella</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+
+  <build_depend>pybind11-dev</build_depend>
+
+  <depend>python3</depend>
+  <depend>rclpy</depend>
+  <depend>rcutils</depend>
+  <depend>rosbag2_cpp</depend>
+  <depend>rosbag2_compression</depend>
+  <depend>rosbag2_storage</depend>
+
+  <test_depend>ament_cmake_nose</test_depend>
+  <test_depend>example_interfaces</test_depend>
+  <test_depend>python3-nose</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
