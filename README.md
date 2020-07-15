@@ -84,10 +84,10 @@ optional arguments:
 ```
 
 The only required option is `-i` (or `--infile`) to specify which input bag
-file to operate on. When run in this way, `filter` acts like Unix `cp` command
-(albeit, inefficient). The output file will be named the same as the input file
-except the suffiex `-filtered.bag` will be appended to the end. Here is an
-example:
+file to operate on. When run in this way, `filter` acts like the Unix `cp`
+command (albeit, inefficient). The output file will be named the same as the
+input file except the suffix `-filtered.bag` will be appended to the end. Here
+is an example:
 
 ```
 $ ls
