@@ -80,7 +80,7 @@ optional arguments:
   --topics T [T ...]    List of topics to include in output bag (default: None)
   --map M [M ...]       Topic name remappings: --map from:to (default: None)
   --compress            Compress output file (default: False)
-  --uncompress          Do no compress output file (default: False)
+  --uncompress          Do not compress output file (default: False)
 ```
 
 The only required option is `-i` (or `--infile`) to specify which input bag

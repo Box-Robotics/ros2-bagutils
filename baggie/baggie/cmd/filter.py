@@ -46,7 +46,7 @@ def get_args():
                                    help="Compress output file")
     compression_group.add_argument("--uncompress", required=False,
                                    action="store_true", default=False,
-                                   help="Do no compress output file")
+                                   help="Do not compress output file")
 
     args = parser.parse_args(sys.argv[1:])
     return args
