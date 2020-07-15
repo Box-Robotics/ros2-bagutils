@@ -44,6 +44,12 @@ install(
   DESTINATION "${PYTHON_INSTALL_DIR}/${PROJECT_NAME}"
   )
 
+install(
+  PROGRAMS
+    scripts/filter
+  DESTINATION lib/${PROJECT_NAME}/
+  )
+
 ##########
 ## Test ##
 ##########

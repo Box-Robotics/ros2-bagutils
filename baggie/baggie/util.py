@@ -65,13 +65,9 @@ def msg2typestr(msg):
     bag.
 
     """
-    mod_components = msg.__class__.__module__.split(".")
-    if mod_components[-1].lower() == \
-      "_" + msg.__class__.__name__.lower():
-        mod_components[-1] = msg.__class__.__name__
-        return "/".join(mod_components)
-    else:
-        raise(BaggieException("msg type name assumptions violated, abort!"))
+    mod_components = msg.__module__.split(".")
+    mod_components[-1] = msg.__class__.__name__
+    return "/".join(mod_components)
 
 def typestr2msgtype(type_str):
     """
@@ -87,14 +83,13 @@ def typestr2msgtype(type_str):
 
     Returns
     -------
-    A `Type` instance of the Python message class.
+    The `Type` of the Python message.
 
     """
     module_components = type_str.split("/")
     type_name = module_components[-1]
 
-    module_components[-1] = "_" + type_name.lower()
-    module_str = ".".join(module_components)
-
+    module_str = ".".join(module_components[0:-1])
     module = importlib.import_module(module_str)
-    return getattr(module, type_name)
+
+    return type(getattr(module, type_name)())
