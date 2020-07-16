@@ -47,6 +47,7 @@ install(
 install(
   PROGRAMS
     scripts/filter
+    scripts/split
   DESTINATION lib/${PROJECT_NAME}/
   )
 

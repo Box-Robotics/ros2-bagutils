@@ -63,8 +63,6 @@ def main() -> int:
         outfile = infile.rstrip(".bag")
         outfile += "-filtered.bag"
 
-    os.makedirs(outfile)
-
     t0 = None
     t1 = None
 

@@ -21,7 +21,6 @@ class TestBaggieWriter(unittest.TestCase):
 
     def setUp(self):
         self.tmp_dir = tempfile.TemporaryDirectory()
-        os.makedirs("{}{}{}".format(self.tmp_dir.name, os.sep, BAGNAME))
 
         bag_file_name="{}{}{}".format(self.tmp_dir.name, os.sep, BAGNAME)
         bag = baggie.Baggie(bag_file_name, mode="w", compress=False)

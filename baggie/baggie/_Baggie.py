@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import os
 import sys
 from contextlib import contextmanager
 
@@ -208,6 +209,7 @@ class Baggie(object):
                     " not '%s'" % type(self.comp_opt_)))
 
             try:
+                os.makedirs(self.s_opt_.uri, exist_ok=True)
                 self.writer_ = _Writer(self.comp_opt_)
                 self.writer_.open(self.s_opt_, self.c_opt_)
 

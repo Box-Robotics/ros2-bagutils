@@ -18,7 +18,6 @@ class TestBaggieWriter(unittest.TestCase):
 
     def setUp(self):
         self.tmp_dir = tempfile.TemporaryDirectory()
-        os.makedirs("{}{}{}".format(self.tmp_dir.name, os.sep, BAGNAME))
 
     def tearDown(self):
         self.tmp_dir.cleanup()

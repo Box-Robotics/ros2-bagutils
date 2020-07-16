@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <chrono>
 #include <memory>
 #include <string>
 #include <vector>
@@ -245,6 +246,12 @@ PYBIND11_MODULE(_baggie, m)
       "message_count",
       &rosbag2_storage::TopicInformation::message_count);
 
+  //
+  // NOTE: Pybind11 converts the chrono types to datetime.*
+  // which only have usec resolution. So, we bind the lambdas below
+  // so we get full nano resolution and convert to rclpy.time.* types in the
+  // Python layer of baggie.
+  //
   py::class_<rosbag2_storage::BagMetadata>(m, "BagMetadata")
     .def(py::init())
     .def_readwrite("version", &rosbag2_storage::BagMetadata::version)
@@ -253,8 +260,17 @@ PYBIND11_MODULE(_baggie, m)
     .def_readwrite(
       "relative_file_paths", &rosbag2_storage::BagMetadata::relative_file_paths)
     .def_readwrite("duration", &rosbag2_storage::BagMetadata::duration)
+    .def("duration_as_nanos", [](const rosbag2_storage::BagMetadata & meta)
+                            {
+                              return meta.duration.count();
+                            })
     .def_readwrite(
       "starting_time", &rosbag2_storage::BagMetadata::starting_time)
+    .def("starting_time_as_nanos",
+         [](const rosbag2_storage::BagMetadata & meta)
+         {
+           return meta.starting_time.time_since_epoch().count();
+         })
     .def_readwrite(
        "message_count", &rosbag2_storage::BagMetadata::message_count)
     .def_readwrite(

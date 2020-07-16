@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+# -*- python -*-
+
+import sys
+from baggie.cmd import split
+
+if __name__ == '__main__':
+    sys.exit(split.main())
