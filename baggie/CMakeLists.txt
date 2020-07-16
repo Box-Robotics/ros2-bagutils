@@ -49,6 +49,7 @@ install(
     scripts/filter
     scripts/join
     scripts/split
+    scripts/timeline
   DESTINATION lib/${PROJECT_NAME}/
   )
 

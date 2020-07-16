@@ -68,6 +68,7 @@ include:
 - [filter](#filter): Copy bag files with optional transformation filters
 - [split](#split): Split a single input bag into multiple, smaller, output bags
 - [join](#join): Join multiple input bags into a single output bag
+- [timeline](#timeline): Print a JSON timeline of messages in a set of bags
 
 #### filter
 The `filter` script is used to copy bag files while also applying some
@@ -348,6 +349,166 @@ End:               Jun 18 2020 15:28:41.397 (1592508521.397)
 Messages:          1414
 Topic information: Topic: /points | Type: sensor_msgs/msg/PointCloud2 | Count: 1414 | Serialization Format: cdr
 ```
+
+#### timeline
+Print a timeline of high-level message data as JSON to the screen. This allows
+for processing with analysis tools like [pandas](https://pandas.pydata.org/) to
+get a view into your ROS message data as a timeseries. The help message for the
+`timeline` script looks like:
+
+```
+$ ros2 run baggie timeline --help
+usage: timeline [-h] [--pretty] [--aos | --soa] INFILE [INFILE ...]
+
+A JSON timeline of messages contained in a set of bags
+
+positional arguments:
+  INFILE      The input bag files to add to the timeline
+
+optional arguments:
+  -h, --help  show this help message and exit
+  --pretty    Pretty print the output JSON (default: False)
+  --aos       Output the data as an array-of-structs (default: False)
+  --soa       Output the data as a struct-of-arrays (default: False)
+```
+It supports file globbing to generate one big JSON timeline from a set of bags
+if that is desireable.
+
+Here is an example. I'll work with a very small bag file that has been filtered
+to contain less than a half-second of LiDAR data. Here is the bag info:
+
+```
+$ ros2 bag info lidar-filtered.bag
+
+Files:             lidar-filtered.bag_0.db3
+Bag size:          1.4 MiB
+Storage id:        sqlite3
+Duration:          0.405s
+Start:             Jun 18 2020 15:26:17.900 (1592508377.900)
+End:               Jun 18 2020 15:26:18.305 (1592508378.305)
+Messages:          10
+Topic information: Topic: /tf | Type: tf2_msgs/msg/TFMessage | Count: 5 | Serialization Format: cdr
+                   Topic: /points | Type: sensor_msgs/msg/PointCloud2 | Count: 5 | Serialization Format: cdr
+```
+
+The `timeline` output supports two different data structures depending upon how
+you want to process your data. The default is the *array-of-structs*:
+
+```
+$ ros2 run baggie timeline --pretty --aos lidar-filtered.bag 2>/dev/null
+[
+    {
+        "stamp": 1592508377900096491,
+        "time": "2020-06-18 15:26:17.900096512",
+        "topic_name": "/points",
+        "type": "sensor_msgs/msg/PointCloud2"
+    },
+    {
+        "stamp": 1592508377900705889,
+        "time": "2020-06-18 15:26:17.900705792",
+        "topic_name": "/tf",
+        "type": "tf2_msgs/msg/TFMessage"
+    },
+    {
+        "stamp": 1592508378001884212,
+        "time": "2020-06-18 15:26:18.001884160",
+        "topic_name": "/tf",
+        "type": "tf2_msgs/msg/TFMessage"
+    },
+    {
+        "stamp": 1592508378003208996,
+        "time": "2020-06-18 15:26:18.003208960",
+        "topic_name": "/points",
+        "type": "sensor_msgs/msg/PointCloud2"
+    },
+    {
+        "stamp": 1592508378104989363,
+        "time": "2020-06-18 15:26:18.104989440",
+        "topic_name": "/points",
+        "type": "sensor_msgs/msg/PointCloud2"
+    },
+    {
+        "stamp": 1592508378107458144,
+        "time": "2020-06-18 15:26:18.107458048",
+        "topic_name": "/tf",
+        "type": "tf2_msgs/msg/TFMessage"
+    },
+    {
+        "stamp": 1592508378201481910,
+        "time": "2020-06-18 15:26:18.201481984",
+        "topic_name": "/tf",
+        "type": "tf2_msgs/msg/TFMessage"
+    },
+    {
+        "stamp": 1592508378202927657,
+        "time": "2020-06-18 15:26:18.202927616",
+        "topic_name": "/points",
+        "type": "sensor_msgs/msg/PointCloud2"
+    },
+    {
+        "stamp": 1592508378303028090,
+        "time": "2020-06-18 15:26:18.303027968",
+        "topic_name": "/points",
+        "type": "sensor_msgs/msg/PointCloud2"
+    },
+    {
+        "stamp": 1592508378305343350,
+        "time": "2020-06-18 15:26:18.305343232",
+        "topic_name": "/tf",
+        "type": "tf2_msgs/msg/TFMessage"
+    }
+]
+```
+
+Alternatively, you can output the data as a *struct-of-arrays*. This format is
+somewhat easier to directly import into analysis tools, YMMV:
+
+```
+$ ros2 run baggie timeline --pretty --soa lidar-filtered.bag 2>/dev/null
+{
+    "stamp": [
+        1592508377900096491,
+        1592508377900705889,
+        1592508378001884212,
+        1592508378003208996,
+        1592508378104989363,
+        1592508378107458144,
+        1592508378201481910,
+        1592508378202927657,
+        1592508378303028090,
+        1592508378305343350
+    ],
+    "topic": [
+        "/points",
+        "/tf",
+        "/tf",
+        "/points",
+        "/points",
+        "/tf",
+        "/tf",
+        "/points",
+        "/points",
+        "/tf"
+    ],
+    "type": [
+        "sensor_msgs/msg/PointCloud2",
+        "tf2_msgs/msg/TFMessage",
+        "tf2_msgs/msg/TFMessage",
+        "sensor_msgs/msg/PointCloud2",
+        "sensor_msgs/msg/PointCloud2",
+        "tf2_msgs/msg/TFMessage",
+        "tf2_msgs/msg/TFMessage",
+        "sensor_msgs/msg/PointCloud2",
+        "sensor_msgs/msg/PointCloud2",
+        "tf2_msgs/msg/TFMessage"
+    ]
+}
+```
+
+**NOTE:** The `2>/dev/null` is to quiet the logging messages from the
+`rosbag2_cpp` code to allow for doing things like piping the output JSON from
+this program into a JSON *grep* tool like `jq` for post-processing on the
+command line.
 
 
 LICENSE
