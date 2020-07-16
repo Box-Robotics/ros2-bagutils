@@ -2,7 +2,7 @@
 # -*- python -*-
 
 import sys
-from baggie.cmd import split as Split
+from baggie.cmd import join as Join
 
 if __name__ == '__main__':
-    sys.exit(Split.main())
+    sys.exit(Join.main())

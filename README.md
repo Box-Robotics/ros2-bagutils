@@ -49,22 +49,25 @@ time libraries support nanosecond precision.
 The above examples are intentionally simplistic and accept many default
 arguments. However, since `baggie` [exposes](./baggie/src/py/_baggie.cpp) a
 significant portion of the C++ API, much more complex use cases are
-supported. The context manager examples above, are a front-end to the central
+supported. The context manager examples above are a front-end to the central
 fixture of this library, the `baggie.Baggie` class. [The Baggie
 class](./baggie/baggie/_Baggie.py) provides an interface for reading or writing
 ROS 2 bag files directly. A given instance of a Baggie can be instantiated as
 either a reader or a writer. One `Baggie` maps to exactly one on-disk ROS 2 bag
 file (which may be made of up several files). Extensive example code is
-available in the [test directory](./baggie/test/) to including manually driving
+available in the [test directory](./baggie/test/) to include manually driving
 the lower-level C++ interface via the Python projections. Additionally,
-real-world examples of using the `baggie` API can be gleaned from reading the
-code for the [utility scripts](./baggie/baggie/cmd/) provided with the `baggie`
-package.
+real-world examples of using the `baggie` API can be seen in the code for the
+[utility scripts](./baggie/baggie/cmd/) provided with the `baggie` package.
 
 ### Utility scripts
 Beyond the Python library code, the `baggie` package provides several
-command-line utilities for performing common operations on bagfiles. Here is a
-high-level overview of what is available including some simple examples.
+command-line utilities for performing common operations on bagfiles. They
+include:
+
+- [filter](#filter): Copy bag files with optional transformation filters
+- [split](#split): Split a single input bag into multiple, smaller, output bags
+- [join](#join): Join multiple input bags into a single output bag
 
 #### filter
 The `filter` script is used to copy bag files while also applying some
@@ -282,6 +285,70 @@ Topic information: Topic: /points | Type: sensor_msgs/msg/PointCloud2 | Count: 3
 ```
 
 #### join
+The inverse operation of `split` is to `join`. In the context of `baggie`, the
+`join` script takes a set of input bag files and joins them into a single
+output bag file. The help for `join` is shown below:
+
+```
+$ ros2 run baggie join --help
+usage: join [-h] -o OUTFILE [--compress | --uncompress] INFILE [INFILE ...]
+
+Joins several ROS 2 bag files into a single combined bag
+
+positional arguments:
+  INFILE                The input bag files to join
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -o OUTFILE, --outfile OUTFILE
+                        The output bag file name to create (default: None)
+  --compress            Compress the output file (default: False)
+  --uncompress          Do not compress the output file (default: False)
+```
+
+Building on the split example from above, we took the input `pointcloud.bag`
+and spit it into 4 smaller bags. Let's join them back into a single bag called
+`lidar.bag`.
+
+```
+$ ls
+00_pointcloud.bag  01_pointcloud.bag  02_pointcloud.bag  03_pointcloud.bag  pointcloud.bag
+
+$ ros2 run baggie join -o lidar.bag 0*.bag
+[INFO] [1594918662.208676635] [rosbag2_storage]: Opened database 'lidar.bag/lidar.bag_0.db3' for READ_WRITE.
+[INFO] [1594918662.214462213] [rosbag2_storage]: Opened database '00_pointcloud.bag/00_pointcloud.bag_0.db3' for READ_ONLY.
+[INFO] [1594918664.026249523] [rosbag2_storage]: Opened database '01_pointcloud.bag/01_pointcloud.bag_0.db3' for READ_ONLY.
+[INFO] [1594918665.776982632] [rosbag2_storage]: Opened database '02_pointcloud.bag/02_pointcloud.bag_0.db3' for READ_ONLY.
+[INFO] [1594918667.354551863] [rosbag2_storage]: Opened database '03_pointcloud.bag/03_pointcloud.bag_0.db3' for READ_ONLY.
+```
+
+Comparing the joined `lidar.bag` with the original `pointcloud.bag`:
+
+```
+$ ros2 bag info pointcloud.bag
+
+Files:             pointcloud.bag_0.db3
+Bag size:          403.5 MiB
+Storage id:        sqlite3
+Duration:          143.497s
+Start:             Jun 18 2020 15:26:17.900 (1592508377.900)
+End:               Jun 18 2020 15:28:41.397 (1592508521.397)
+Messages:          1414
+Topic information: Topic: /points | Type: sensor_msgs/msg/PointCloud2 | Count: 1414 | Serialization Format: cdr
+
+
+$ ros2 bag info lidar.bag
+
+Files:             lidar.bag_0.db3
+Bag size:          403.5 MiB
+Storage id:        sqlite3
+Duration:          143.497s
+Start:             Jun 18 2020 15:26:17.900 (1592508377.900)
+End:               Jun 18 2020 15:28:41.397 (1592508521.397)
+Messages:          1414
+Topic information: Topic: /points | Type: sensor_msgs/msg/PointCloud2 | Count: 1414 | Serialization Format: cdr
+```
+
 
 LICENSE
 =======
